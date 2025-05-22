@@ -1,0 +1,25 @@
+name = "Solarized"
+description = "A theme based on the Solarized color scheme by Ethan Schoonover."
+
+tags = []
+
+license = "MIT"
+homepage = "https://github.com/komputerwiz/solarized-zola-theme"
+min_version = "0.20.0"
+
+demo = ""
+
+[extra]
+
+[extra.menus]
+main = []
+right = []
+
+[author]
+name = "Matthew Barry"
+homepage = "https://komputerwiz.net"
+
+[original]
+name = "Ethan Schoonover"
+homepage = "https://ethanschoonover.com/solarized/`"
+repo = "https://github.com/altercation/solarized"

@@ -1,0 +1,52 @@
+{% extends "index.html" %}
+
+{% block title %}{{ page.title }} | {{ super() }}{% endblock %}
+
+{% macro nextprev(reverse=false) %}
+	{%- if reverse -%}
+		{%- set prev = page.lower -%}
+		{% set next = page.higher -%}
+	{%- else -%}
+		{%- set prev = page.higher -%}
+		{%- set next = page.lower -%}
+	{%- endif -%}
+
+	{%- if next or prev -%}
+		<div class="clearfix my-3 d-print-none">
+			{%- if prev -%}
+				<a class="btn btn-outline-secondary float-start" href="{{ prev.permalink }}">&laquo; {{ prev.title }}</a>
+			{%- endif -%}
+			{%- if next -%}
+				<a class="btn btn-outline-secondary float-end" href="{{ next.permalink }}">{{ next.title }} &raquo;</a>
+			{%- endif -%}
+		</div>
+	{%- endif -%}
+{% endmacro %}
+
+{% block content %}
+	{{ self::nextprev() }}
+	{{ super() }}
+	{{ self::nextprev() }}
+{% endblock %}
+
+{% block article %}
+	<h1>{{ page.title | safe }}</h1>
+	<section>
+		{{ page.content | safe }}
+	</section>
+
+	{% if page.backlinks %}
+		<h1>References</h1>
+		<ul>
+			{% for link in page.backlinks %}
+				<li><a href="{{ link.permalink }}">{{ link.title }}</a></li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+{% endblock %}
+
+{% block footer %}
+	{% if page.date %}
+		<p><em>Last Updated: {{ page.date | date(format="%Y-%m-%d") }}</em></p>
+	{% endif %}
+{% endblock %}

@@ -1,0 +1,227 @@
+{%- macro nav_menu(items) -%}
+	{% for item in items %}
+		{% set permalink = item.url | default(value=get_url(path=item.path)) %}
+		{% set is_active = current_url is starting_with(permalink) %}
+		{% if item.children %}
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle{% if is_active %} active{% endif %}" href="#" id="{{ item.id }}" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					{{ item.name }}
+					{% if is_active %}
+						<span class="visually-hidden">(current)</span>
+					{% endif %}
+				</a>
+				<ul class="dropdown-menu" aria-labelledby="{{ item.id }}">
+					{% for child in item.children %}
+						{% set child_permalink = get_url(path=child.path) %}
+						{% set child_active = current_url is starting_with(child_permalink) %}
+						<li>
+							<a class="dropdown-item{% if child_active %} active{% endif %}" href="{{ child_permalink }}">
+								{{ child.name }}
+								{% if child_active %}
+									<span class="visually-hidden">(current)</span>
+								{% endif %}
+							</a>
+						</li>
+					{% endfor %}
+				</ul>
+			</li>
+		{% else %}
+			<li class="nav-item">
+				<a class="nav-link{% if is_active %} active{% endif %}" href="{{ permalink }}">
+					{{ item.name }}
+					{% if is_active %}
+						<span class="visually-hidden">(current)</span>
+					{% endif %}
+				</a>
+			</li>
+		{% endif %}
+	{% endfor %}
+{%- endmacro -%}
+
+{%- macro toc_recursive(headers) -%}
+	<ul>
+		{% for header in headers %}
+			<li>
+				<a href="{{ header.permalink | safe }}">{{ header.title }}</a>
+				{% if header.children %}
+					{{ self::toc_recursive(headers=header.children) }}
+				{% endif %}
+			</li>
+		{% endfor %}
+	</ul>
+{%- endmacro -%}
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+		<title>{% block title %}{{ config.title }}{% endblock %}</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
+		<link rel="stylesheet" href="{{ get_url(path="assets/fonts/fira-code/index.css", trailing_slash=false) }}">
+		<link rel="stylesheet" href="{{ get_url(path="assets/fonts/iosevka/index.css", trailing_slash=false) }}">
+		<link rel="stylesheet" href="{{ get_url(path="assets/fonts/ubuntu-mono/index.css", trailing_slash=false) }}">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+		<link rel="stylesheet" href="{{ get_url(path="assets/css/main.css", trailing_slash=false) }}">
+
+		{% if config.generate_feed %}
+			<link rel="alternate" type="application/{% if config.feed_filename == "atom.xml" %}atom{% else %}rss{% endif %}+xml" title="RSS Feed" href="{{ get_url(path=config.feed_filename) | safe }}">
+		{% endif %}
+
+		<script src="{{ get_url(path="assets/main.js", trailing_slash=false )}}"></script>
+
+		{% block extra_head %}{% endblock %}
+	</head>
+	<body>
+		{% block body %}
+			{% block header %}
+				<header>
+					<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+						<div class="container-fluid">
+							<a class="navbar-brand" href="{{ config.base_url }}">{{ config.title }}</a>
+							<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+								<span class="navbar-toggler-icon"></span>
+							</button>
+							<div class="collapse navbar-collapse" id="navbarContent">
+								<!-- main navigation -->
+								<ul class="navbar-nav me-auto">
+									{{ self::nav_menu(items=config.extra.menus.main, class="me-auto") }}
+								</ul>
+
+								<!-- right navigation -->
+
+								<ul class="navbar-nav">
+									{{ self::nav_menu(items=config.extra.menus.right) }}
+
+									<!-- font picker -->
+									<li class="nav-item dropdown">
+										<button class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center" id="bd-font" type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Select Font (Iosevka)">
+											<i class="bi-fonts"></i>
+											<span class="d-lg-none ms-2" id="bd-font-text">Select font</span>
+										</button>
+										<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-font-text">
+											<li><button class="dropdown-item d-flex align-items-center active" style="font-family: Iosevka;" type="button" data-font-value="Iosevka" aria-pressed="true">Iosevka</button></li>
+											<li><button class="dropdown-item d-flex align-items-center" style="font-family: 'Fira Code';" type="button" data-font-value="Fira Code" aria-pressed="false">Fira Code</button></li>
+											<li><button class="dropdown-item d-flex align-items-center" style="font-family: 'Ubuntu Mono';" type="button" data-font-value="Ubuntu Mono" aria-pressed="false">Ubuntu Mono</button></li>
+										</ul>
+									</li>
+
+									<!-- light/dark theme picker-->
+									<li class="nav-item dropdown">
+										<button class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Toggle theme (auto)">
+											<i id="theme-icon-active" class="bi-circle-half"></i>
+											<span class="d-lg-none ms-2" id="bd-theme-text">Toggle theme</span>
+										</button>
+										<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme-text">
+											<li>
+												<button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" data-bs-theme-icon="bi-sun-fill" aria-pressed="false">
+													<i class="theme-icon opacity-50 me-2 bi-sun-fill"></i>
+													Light
+													<i class="ms-auto d-none bi-check2"></i>
+												</button>
+											</li>
+											<li>
+												<button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="dark" data-bs-theme-icon="bi-moon-stars-fill" aria-pressed="false">
+													<i class="theme-icon opacity-50 me-2 bi-moon-stars-fill"></i>
+													Dark
+													<i class="ms-auto d-none bi-check2"></i>
+												</button>
+											</li>
+											<li>
+												<button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto" data-bs-theme-icon="bi-circle-half" aria-pressed="true">
+													<i  class="theme-icon opacity-50 me-2 bi-circle-half"></i>
+													Auto
+													<i class="ms-auto d-none bi-check2"></i>
+												</button>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</nav>
+				</header>
+			{% endblock %}
+			<div class="container py-3">
+				{% block content %}
+					<div class="row">
+						{% if page.toc %}
+							<div class="col-lg-3 order-lg-2">
+								<nav class="toc">
+									<h1>Contents</h1>
+									{{ self::toc_recursive(headers=page.toc) }}
+									{#
+									<ul>
+										{% for h1 in page.toc %}
+											<li>
+												<a href="{{ h1.permalink | safe }}">{{ h1.title }}</a>
+												{% if h1.children %}
+													<ul>
+														{% for h2 in h1.children %}
+															<li>
+																<a href="{{ h2.permalink | safe }}">{{ h2.title }}</a>
+															</li>
+														{% endfor %}
+													</ul>
+												{% endif %}
+											</li>
+										{% endfor %}
+									</ul>
+									#}
+								</nav>
+							</div>
+						{% endif %}
+
+						<div class="col order-lg-1">
+							<article classdata-pagefind-body>
+								{% block article %}
+									<h1>{{ section.title | safe }}</h1>
+									<section>
+										{{ section.content | safe }}
+									</section>
+
+									{% if section.subsections %}
+										<h1>Sections</h1>
+										<ul class="subsections">
+											{% for subsection in section.subsections %}
+												{% set subsection = get_section(path=subsection, metadata_only=true) %}
+												<li><a href="{{ subsection.permalink }}">{{ subsection.title | safe }}</a></li>
+											{% endfor %}
+										</ul>
+									{% endif %}
+
+									{% if section.pages %}
+										<h1>Pages</h1>
+										<ul class="pages">
+											{% for page in section.pages %}
+												<li><a href="{{ page.permalink }}">{{ page.title | safe }}</a></li>
+											{% endfor %}
+										</ul>
+									{% endif %}
+
+									{% if section.backlinks %}
+										<h1>References</h1>
+										<ul>
+											{% for link in section.backlinks %}
+												<li><a href="{{ link.permalink }}">{{ link.title }}</a></li>
+											{% endfor %}
+										</ul>
+									{% endif %}
+								{% endblock %}
+							</article>
+						</div>
+					</div>
+				{% endblock %}
+			</div>
+			<footer>
+				{% block footer %}{% endblock %}
+			</footer>
+		{% endblock %}
+
+		<pre><code>{{ __tera_context }}</code></pre>
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+	</body>
+</html>
