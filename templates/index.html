@@ -145,6 +145,19 @@
 				</header>
 			{% endblock %}
 			<div class="container py-3">
+				{% block breadcrumb %}
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							{% set current = section | default(value=page) %}
+							{% for ancestor in current.ancestors %}
+								{% set sec = get_section(path=ancestor, metadata_only=true) %}
+								<li class="breadcrumb-item"><a href="{{ sec.permalink }}">{{ sec.title | default(value='Home') }}</a></li>
+							{% endfor %}
+							<li class="breadcrumb-item active" aria-current="page">{{ current.title }}</li>
+						</ol>
+					</nav>
+				{% endblock %}
+
 				{% block content %}
 					<div class="row">
 						{% if page.toc %}
@@ -152,24 +165,6 @@
 								<nav class="toc">
 									<h1>Contents</h1>
 									{{ self::toc_recursive(headers=page.toc) }}
-									{#
-									<ul>
-										{% for h1 in page.toc %}
-											<li>
-												<a href="{{ h1.permalink | safe }}">{{ h1.title }}</a>
-												{% if h1.children %}
-													<ul>
-														{% for h2 in h1.children %}
-															<li>
-																<a href="{{ h2.permalink | safe }}">{{ h2.title }}</a>
-															</li>
-														{% endfor %}
-													</ul>
-												{% endif %}
-											</li>
-										{% endfor %}
-									</ul>
-									#}
 								</nav>
 							</div>
 						{% endif %}
@@ -220,7 +215,11 @@
 			</footer>
 		{% endblock %}
 
-		<pre><code>{{ __tera_context }}</code></pre>
+		{#
+		{% if config.extra.debug -%}
+			<pre><code>{{ __tera_context }}</code></pre>
+		{%- endif %}
+		#}
 
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
 	</body>

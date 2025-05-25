@@ -4,11 +4,11 @@
 
 {% macro nextprev(reverse=false) %}
 	{%- if reverse -%}
-		{%- set prev = page.lower -%}
-		{% set next = page.higher -%}
-	{%- else -%}
 		{%- set prev = page.higher -%}
 		{%- set next = page.lower -%}
+	{%- else -%}
+		{%- set prev = page.lower -%}
+		{%- set next = page.higher -%}
 	{%- endif -%}
 
 	{%- if next or prev -%}
