@@ -1,0 +1,33 @@
+{%- if width or height -%}
+	{%- set resized = resize_image(path=src, width=width, height=height, op=mode) -%}
+	{%- set final_src = resized.url -%}
+{%- else -%}
+	{%- set final_src = src -%}
+{%- endif -%}
+
+<figure class="figure">
+	<a href="{{ link | default(value=src) }}"
+		{%- if target %} target="{{ target }}"{% endif -%}
+		{%- if rel %} rel="{{ rel }}"{% endif -%}
+	>
+		<img src="{{ final_src }}" class="figure-img img-fluid rounded"
+			{%- if alt or title %} alt="{{ alt | default(value=title) }}"{% endif -%}
+		>
+	</a>
+
+	{% if caption or title or cite %}
+		<figcaption class="figure-caption">
+			{% if title %}<h4>{{ title }}</h4>{% endif %}
+			{% if caption %}<p>{{ caption }}</p>{% endif %}
+			{% if cite %}
+				<cite>
+					{%- if citelink -%}
+						<a href="{{ citelink }}" target="_blank">{{ cite }}</a>
+					{%- else -%}
+						{{- cite -}}
+					{%- endif -%}
+				</cite>
+			{% endif %}
+		</figcaption>
+	{% endif %}
+</figure>
