@@ -10,7 +10,7 @@
 				{%- else -%}
 					{%- set asset_url = get_url(path=asset) -%}
 				{%- endif -%}
-				<div class="col-md-3">
+				<div class="col-6  col-md-4 col-xl-3">
 					<div class="card mb-4 box-shadow">
 						<a href="{{ asset_url }}"><img class="card-img-top" src="{{ thumb.url }}" alt="{{ page.extra.assets[info_key].alt | default(value='') }}"></a>
 						<div class="card-body">
