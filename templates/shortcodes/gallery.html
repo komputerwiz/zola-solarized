@@ -2,20 +2,26 @@
 	<div class="row">
 		{% for asset in page.assets -%}
 			{%- if asset is matching("[.](jpg|png)$") -%}
-				{% set info_key = asset | split(pat="/") | last | split(pat=".") | first %}
-				{% set image = resize_image(path=asset, width=200, height=200) %}
+				{%- set info_key = asset | split(pat="/") | last | split(pat=".") | first -%}
+				{%- set thumb = resize_image(path=asset, width=200, height=200) -%}
+				{%- if max_size -%}
+					{%- set image = resize_image(path=asset, width=max_size, height=max_size, op="fit") -%}
+					{%- set asset_url = image.url -%}
+				{%- else -%}
+					{%- set asset_url = get_url(path=asset) -%}
+				{%- endif -%}
 				<div class="col-md-3">
 					<div class="card mb-4 box-shadow">
-						<a href="{{ get_url(path=asset) }}"><img class="card-img-top" src="{{ image.url }}" alt="{{ page.extra.assets[info_key].alt | default(value='') }}"></a>
+						<a href="{{ asset_url }}"><img class="card-img-top" src="{{ thumb.url }}" alt="{{ page.extra.assets[info_key].alt | default(value='') }}"></a>
 						<div class="card-body">
-							{% if page.extra.assets[info_key].title is defined %}
+							{% if page.extra.assets[info_key].title is defined -%}
 								<h4 class="card-title">{{ page.extra.assets[info_key].title | markdown(inline=true) | safe }}</h4>
-							{% endif %}
-							{% if page.extra.assets[info_key].description is defined %}
+							{%- endif %}
+							{% if page.extra.assets[info_key].description is defined -%}
 								<div class="card-text">
-									{{ page.extra.assets[info_key].description | markdown | safe }}
+									{{- page.extra.assets[info_key].description | markdown | safe -}}
 								</div>
-							{% endif %}
+							{%- endif %}
 						</div>
 						{% if page.extra.assets[info_key].date is defined or page.extra.assets[info_key].tags is defined -%}
 							<div class="card-footer text-body-secondary d-flex justify-content-between">
