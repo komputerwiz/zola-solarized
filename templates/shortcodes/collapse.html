@@ -1,0 +1,12 @@
+<div class="card mb-3">
+	<div class="card-header" id="{{ id }}Heading">
+		<h5 class="mb-0" style="cursor:pointer" data-bs-toggle="collapse" data-bs-target="#{{ id }}" aria-expanded="false" aria-controls="{{ id }}">
+			{{ title | default(value="Expand") }}
+		</h5>
+	</div>
+	<div id="{{ id }}" class="collapse" aria-labelledby="{{ id }}Heading">
+		<div class="card-body">
+			{{ body | markdown | safe }}
+		</div>
+	</div>
+</div>
