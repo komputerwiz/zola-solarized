@@ -179,31 +179,37 @@
 									</section>
 
 									{% if section.subsections %}
-										<h1>Sections</h1>
-										<ul class="subsections">
-											{% for subsection in section.subsections %}
-												{% set subsection = get_section(path=subsection, metadata_only=true) %}
-												<li><a href="{{ subsection.permalink }}">{{ subsection.title | safe }}</a></li>
-											{% endfor %}
-										</ul>
+										{% block subsections %}
+											<h1>Sections</h1>
+											<ul class="subsections">
+												{% for subsection in section.subsections %}
+													{% set subsection = get_section(path=subsection, metadata_only=true) %}
+													<li><a href="{{ subsection.permalink }}">{{ subsection.title | safe }}</a></li>
+												{% endfor %}
+											</ul>
+										{% endblock %}
 									{% endif %}
 
 									{% if section.pages %}
-										<h1>Pages</h1>
-										<ul class="pages">
-											{% for page in section.pages %}
-												<li><a href="{{ page.permalink }}">{{ page.title | safe }}</a></li>
-											{% endfor %}
-										</ul>
+										{% block pages %}
+											<h1>Pages</h1>
+											<ul class="pages">
+												{% for page in section.pages %}
+													<li><a href="{{ page.permalink }}">{{ page.title | safe }}</a></li>
+												{% endfor %}
+											</ul>
+										{% endblock %}
 									{% endif %}
 
 									{% if section.backlinks %}
-										<h1>References</h1>
-										<ul>
-											{% for link in section.backlinks %}
-												<li><a href="{{ link.permalink }}">{{ link.title }}</a></li>
-											{% endfor %}
-										</ul>
+										{% block backlinks %}
+											<h1>References</h1>
+											<ul>
+												{% for link in section.backlinks %}
+													<li><a href="{{ link.permalink }}">{{ link.title }}</a></li>
+												{% endfor %}
+											</ul>
+										{% endblock %}
 									{% endif %}
 								{% endblock %}
 							</article>
