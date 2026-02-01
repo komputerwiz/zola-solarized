@@ -1,0 +1,26 @@
+
+{% extends "index.html" %}
+
+{% block title %}{{ term.name }} | {{ taxonomy.name }} | {{ super() }}{% endblock %}
+
+{% block breadcrumb %}
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="{{ config.base_url }}">Home</a></li>
+			{% set parent = get_taxonomy(kind=taxonomy.name) %}
+			<li class="breadcrumb-item"><a href="{{ parent.permalink }}">{{ taxonomy.name }}</a></li>
+			<li class="breadcrumb-item active" aria-current="page">{{ term.name }}</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<article>
+		<h1>Pages</h1>
+		<ul class="pages">
+			{% for page in term.pages %}
+				<li><a href="{{ page.permalink }}">{{ page.title | safe }}</a></li>
+			{% endfor %}
+		</ul>
+	</article>
+{% endblock %}

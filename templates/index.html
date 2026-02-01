@@ -211,6 +211,23 @@
 											</ul>
 										{% endblock %}
 									{% endif %}
+
+									{% if section.taxonomies %}
+										{% block taxonomies %}
+											<h1>Taxonomies</h1>
+											<ul>
+												{% for taxonomy, terms in section.taxonomies %}
+													{% set taxonomy = get_taxonomy(kind=taxonomy) %}
+													<li>
+														<strong><a href="{{ taxonomy.permalink }}">{{ taxonomy.name }}</a>:</strong>
+														{% for term in terms %}
+															<a href="{{ get_taxonomy_url(kind=taxonomy.name, name=term) }}">{{ term }}</a>
+														{% endfor %}
+													</li>
+												{% endfor %}
+											</ul>
+										{% endblock %}
+									{% endif %}
 								{% endblock %}
 							</article>
 						</div>

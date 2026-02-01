@@ -43,6 +43,23 @@
 			{% endfor %}
 		</ul>
 	{% endif %}
+
+	{% if page.taxonomies %}
+		{% block taxonomies %}
+			<h1>Taxonomies</h1>
+			<dl class="row">
+				{% for name, terms in page.taxonomies %}
+					{% set taxonomy = get_taxonomy(kind=name) %}
+					<dt class="col-3 text-end"><a href="{{ taxonomy.permalink }}">{{ name }}</a>:</dt>
+					<dd class="col-9">
+						{% for term in terms %}
+							<a href="{{ get_taxonomy_url(kind=name, name=term) }}">{{ term }}</a>
+						{% endfor %}
+					</dd>
+				{% endfor %}
+			</dl>
+		{% endblock %}
+	{% endif %}
 {% endblock %}
 
 {% block footer %}
